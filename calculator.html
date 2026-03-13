@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The B2B Predictability Simulator | Veloxify</title>
+    <meta name="description"
+        content="Calculate the exact volume needed to make your B2B pipeline predictable and see how automation can save you hundreds of hours.">
+    <!-- Google Fonts: Inter & Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --deep-navy: #0A192F;
+            --pipeline-green: #10B981;
+            --trigger-orange: #F97316;
+            --slate-gray: #F1F5F9;
+            --tech-white: #FFFFFF;
+            --glass-bg: rgba(241, 245, 249, 0.08);
+            --glass-border: rgba(241, 245, 249, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--deep-navy);
+            color: var(--tech-white);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Background effects */
+        .bg-glow {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.05) 0%, rgba(10, 25, 47, 0) 70%);
+            transform: translate(-50%, -50%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        header {
+            padding: 2.5rem 1.5rem;
+            text-align: center;
+        }
+
+        .logo {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.5rem;
+        }
+
+        .logo span {
+            color: var(--pipeline-green);
+        }
+
+        header h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 400;
+            color: var(--slate-gray);
+            opacity: 0.8;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        main {
+            flex: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 0 1.5rem 4rem;
+        }
+
+        .simulator-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        @media (max-width: 768px) {
+            .simulator-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Glassmorphism Card Style */
+        .glass-card {
+            background: rgba(241, 245, 249, 0.12);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(241, 245, 249, 0.2);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .input-group {
+            margin-bottom: 2rem;
+        }
+
+        .input-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--slate-gray);
+            margin-bottom: 0.75rem;
+            opacity: 0.9;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        input[type="number"],
+        input[type="range"] {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            color: var(--tech-white);
+            font-size: 1.2rem;
+            font-weight: 600;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        input[type="number"]:focus {
+            border-color: var(--pipeline-green);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+        }
+
+        .unit {
+            position: absolute;
+            right: 1.25rem;
+            color: var(--pipeline-green);
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        /* Results Display */
+        .results-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 1.5rem;
+        }
+
+        .result-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .result-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--pipeline-green);
+            margin-bottom: 0.5rem;
+        }
+
+        .result-value {
+            font-family: 'Outfit', sans-serif;
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--tech-white);
+            line-height: 1;
+        }
+
+        .result-sub {
+            font-size: 0.9rem;
+            color: var(--slate-gray);
+            opacity: 0.6;
+            margin-top: 0.25rem;
+        }
+
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--glass-border), transparent);
+            width: 100%;
+            margin: 0.5rem 0;
+        }
+
+        /* Shock Section */
+        .shock-section {
+            margin-top: 2rem;
+            text-align: center;
+            padding: 3rem;
+            background: rgba(249, 115, 22, 0.05);
+            border: 2px dashed rgba(249, 115, 22, 0.2);
+            border-radius: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .shock-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--trigger-orange);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin-bottom: 1rem;
+        }
+
+        .shock-value-container {
+            margin: 1.5rem 0;
+        }
+
+        .manual-hours {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--trigger-orange);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            text-shadow: 0 0 30px rgba(249, 115, 22, 0.2);
+            line-height: 1.2;
+            text-transform: uppercase;
+        }
+
+        #res-hours {
+            font-size: 6rem;
+            font-weight: 800;
+            display: inline-block;
+        }
+
+        @media (max-width: 600px) {
+            .manual-hours {
+                font-size: 1.5rem;
+            }
+
+            #res-hours {
+                font-size: 4rem;
+            }
+        }
+
+        .shock-subtitle {
+            font-size: 1.2rem;
+            color: var(--slate-gray);
+            max-width: 500px;
+            margin: 0 auto 2.5rem;
+            opacity: 0.9;
+        }
+
+        /* CTA Button */
+        .cta-button {
+            display: inline-block;
+            background-color: var(--pipeline-green);
+            color: var(--deep-navy);
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 1.2rem;
+            padding: 1.25rem 2.5rem;
+            border-radius: 100px;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.2);
+            position: relative;
+            animation: pulse 2s infinite;
+        }
+
+        .cta-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 30px rgba(16, 185, 129, 0.4);
+            filter: brightness(1.1);
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 20px rgba(16, 185, 129, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+            }
+        }
+
+        /* Tooltip-like info */
+        .info-note {
+            font-size: 0.8rem;
+            color: var(--slate-gray);
+            opacity: 0.5;
+            margin-top: 2rem;
+            font-style: italic;
+        }
+
+        /* Chrome/Safari/Edge remove arrows */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-glow"></div>
+
+    <header>
+        <div class="logo">VELO<span>XIFY</span></div>
+        <h1>The B2B Predictability Simulator</h1>
+        <p style="margin-top: 10px; color: var(--slate-gray); opacity: 0.7;">Calculate the exact volume needed to make
+            your pipeline predictable.</p>
+    </header>
+
+    <main>
+        <div class="simulator-grid">
+            <!-- Inputs Column -->
+            <div class="glass-card">
+                <div class="input-group">
+                    <label for="target-revenue">Target Extra Monthly Revenue</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="target-revenue" value="10000" step="1000">
+                        <span class="unit">$</span>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="ticket-size">Average Ticket Size (LTV)</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="ticket-size" value="2500" step="100">
+                        <span class="unit">$</span>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="close-rate">Sales Call Close Rate (%)</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="close-rate" value="20" min="1" max="100">
+                        <span class="unit">%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Live Results Column -->
+            <div class="glass-card results-container">
+                <div class="result-item">
+                    <div class="result-label">Clients Needed</div>
+                    <div class="result-value" id="res-clients">4</div>
+                    <div class="result-sub">New monthly deals</div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="result-item">
+                    <div class="result-label">Sales Calls Needed</div>
+                    <div class="result-value" id="res-calls">20</div>
+                    <div class="result-sub">Strategy sessions booked</div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="result-item">
+                    <div class="result-label">Outreach Volume Required</div>
+                    <div class="result-value" id="res-leads">6,667</div>
+                    <div class="result-sub">Validated leads to contact</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shock Reveal Section -->
+        <div class="shock-section">
+            <div class="shock-title">Shocking Requirement</div>
+            <div class="shock-value-container">
+                <span class="manual-hours">Manual Time Required: <span id="res-hours">1,111</span> Hours per
+                    month</span>
+            </div>
+            <p class="shock-subtitle">
+                That's how long it would take a human to manually research and personalize these emails. You'd need
+                <span id="res-staff" style="font-weight: 700;">6</span> full-time employees just for outreach.
+            </p>
+
+            <a href="https://veloxify.ai" class="cta-button" id="cta-link">
+                Don't have <span id="cta-hours">1,111</span> hours? Let Veloxify automate this for you.
+            </a>
+
+            <div class="info-note">
+                *Calculation assumes a 2% positive reply rate and 15% booking rate (Industry standard for personalized
+                cold outreach).
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const inputs = {
+            revenue: document.getElementById('target-revenue'),
+            ticket: document.getElementById('ticket-size'),
+            closeRate: document.getElementById('close-rate')
+        };
+
+        const displays = {
+            clients: document.getElementById('res-clients'),
+            calls: document.getElementById('res-calls'),
+            leads: document.getElementById('res-leads'),
+            hours: document.getElementById('res-hours'),
+            staff: document.getElementById('res-staff'),
+            ctaHours: document.getElementById('cta-hours')
+        };
+
+        function formatNumber(num) {
+            return Math.ceil(num).toLocaleString('en-US');
+        }
+
+        function animateValue(obj, start, end, duration) {
+            if (start === end) return;
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const current = Math.floor(progress * (end - start) + start);
+                obj.innerHTML = formatNumber(current);
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                } else {
+                    obj.innerHTML = formatNumber(end);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        let prevValues = {
+            clients: 4,
+            calls: 20,
+            leads: 6667,
+            hours: 1111
+        };
+
+        function calculate() {
+            const revenue = parseFloat(inputs.revenue.value) || 0;
+            const ticket = parseFloat(inputs.ticket.value) || 1;
+            const closeRate = (parseFloat(inputs.closeRate.value) || 1) / 100;
+
+            const clientsNeeded = revenue / ticket;
+            const callsNeeded = clientsNeeded / closeRate;
+
+            // Leads to Contact via Cold Outreach: (Calls Needed / 0.003)
+            // Note: 2% positive reply rate * 15% booking rate = 0.003 or 0.3% conversion from lead to call
+            const leadsToContact = callsNeeded / 0.003;
+
+            // Manual Time Required: (Leads to Contact * 10) / 60
+            const hoursRequired = (leadsToContact * 10) / 60;
+            const staffNeeded = Math.ceil(hoursRequired / 160); // 160 hours per month standard
+
+            // Update displays with animation
+            animateValue(displays.clients, prevValues.clients, clientsNeeded, 500);
+            animateValue(displays.calls, prevValues.calls, callsNeeded, 500);
+            animateValue(displays.leads, prevValues.leads, leadsToContact, 500);
+            animateValue(displays.hours, prevValues.hours, hoursRequired, 500);
+            animateValue(displays.ctaHours, prevValues.hours, hoursRequired, 500);
+
+            displays.staff.innerHTML = staffNeeded;
+
+            // Preserve current values for next animation
+            prevValues = {
+                clients: clientsNeeded,
+                calls: callsNeeded,
+                leads: leadsToContact,
+                hours: hoursRequired
+            };
+        }
+
+        // Add event listeners
+        Object.values(inputs).forEach(input => {
+            input.addEventListener('input', calculate);
+        });
+
+        // Initial calc
+        calculate();
+    </script>
+</body>
+
+</html>
