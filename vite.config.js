@@ -1,9 +1,15 @@
 import { defineConfig } from 'vite'
+import { resolve } from 'path'
 
 export default defineConfig({
-    // Vite config options
-    base: './', // Ensures assets are linked correctly even in subfolders
+    base: './',
     build: {
         outDir: 'dist',
-    }
+        rollupOptions: {
+            input: {
+                main: resolve(__dirname, 'index.html'),
+                calculator: resolve(__dirname, 'calculator/index.html'),
+            },
+        },
+    },
 })
